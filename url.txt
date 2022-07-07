@@ -1,2 +1,5 @@
 url01 GitHub repository
 https://github.com/rishkov88/UdaPeople-project-cicd
+
+ "class-validator": "^0.9.1",
+     "standard-version": "^4.4.0",
