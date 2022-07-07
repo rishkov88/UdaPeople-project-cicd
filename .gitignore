@@ -1,3 +1,4 @@
+.circleci/config-sample.yml
 *~
 *.sw[mnpcod]
 *.log
