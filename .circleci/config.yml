@@ -3,12 +3,12 @@ version: 2.1
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:13.8.0   # Docker image
     steps:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - run:
+      - run:    # job code
           name: Build front-end
           command: |
             cd frontend
@@ -20,12 +20,12 @@ jobs:
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: circleci/node:13.8.0   # Docker image
     steps:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run:
+      - run:    # job code
           name: Back-end build
           command: |
             cd backend
@@ -37,12 +37,12 @@ jobs:
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image here
+      - image: circleci/node:13.8.0   # Docker image
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
           keys: [frontend-build]    # Restore from cache
-      - run:    # job code here
+      - run:    # job code
           name: Test front-end
           command: |
             cd frontend   
@@ -51,17 +51,48 @@ jobs:
                 
   test-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image here
+      - image: circleci/node:13.8.0   # Docker image
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
           keys: [backend-build]    # Restore from cache
-      - run:    # job code here
+      - run:    # job code
           name: Test back-end
           command: |
             cd backend   
             npm install   
             npm run test
+
+  scan-frontend:
+    docker:
+      - image: circleci/node:13.8.0   # Docker image
+    steps:
+      - checkout    # Checkout code from git
+      - restore_cache:
+          keys: [frontend-build]    # Restore from cache
+      - run:    # job code
+          name: Front-end Scan
+          command: |
+            cd frontend
+            npm install
+            # npm install oauth-sign@^0.9.0
+            npm audit --audit-level=critical
+     
+  scan-backend:
+    docker:
+      - image: circleci/node:13.8.0   # Docker image
+    steps:
+      - checkout    # Checkout code from git
+      - restore_cache:
+          keys: [backend-build]    # Restore from cache
+      - run:    # job code
+          name: Back-end Scan
+          command: |
+            cd backend
+            npm install
+            # npm install oauth-sign@^0.9.0
+            npm audit --audit-level=critical
+            
 
 workflows:
   default:
@@ -72,3 +103,7 @@ workflows:
           requires: [build-frontend]
       - test-backend:
           requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
