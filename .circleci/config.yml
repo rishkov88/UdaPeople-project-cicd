@@ -135,9 +135,9 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/backend.yml \
             --tags project=udapeople \
-            --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --stack-name udapeople-backend-${CIRCLE_PROJECT_REPONAME} \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
-#            --stack-name udapeople-backend-${CIRCLE_PROJECT_REPONAME} \
+#            --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \     
 
       - run:
           name: Ensure front-end infrastructure exist
@@ -145,9 +145,9 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/frontend.yml \
             --tags project=udapeople \
-            --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --stack-name udapeople-frontend-${CIRCLE_PROJECT_REPONAME} \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}
-#            --stack-name udapeople-frontend-${CIRCLE_PROJECT_REPONAME} \
+#            --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
               
       - run:
           name: Add public ip to ansible inventory
@@ -166,12 +166,12 @@ jobs:
           event: fail
 
       - destroy-environment:
-          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-#          to: udapeople-frontend-${CIRCLE_PROJECT_REPONAME}    # rollback on failure 
+#          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-frontend-${CIRCLE_PROJECT_REPONAME}    # rollback on failure 
 
       - destroy-environment:
-          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-#          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}     # rollback on failure 
+#          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}     # rollback on failure 
 
   configure-infrastructure:
     docker:
@@ -199,12 +199,12 @@ jobs:
           event: always
 
       - destroy-environment:
-          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-#          to: udapeople-frontend-${CIRCLE_PROJECT_REPONAME}
+#          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-frontend-${CIRCLE_PROJECT_REPONAME}
 
       - destroy-environment:
-          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-#          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}
+#          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}
       # Here's where you will add some code to rollback on failure      
 
 
