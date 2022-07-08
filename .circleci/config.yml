@@ -109,7 +109,7 @@ jobs:
      
   scan-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image
+      - image: circleci/node:13.8.0   # Docker image 
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
@@ -127,7 +127,7 @@ jobs:
 
   deploy-infrastructure:
     docker: 
-      - image: amazon/aws-cli    # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli    # Docker image that supports AWS CLI
     steps:
       - checkout    # Checkout code from git
       - run:
@@ -158,9 +158,32 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment # Here's where you will add some code to rollback on failure  
+      - destroy-environment   # rollback on failure  
       - slack/notify:
           event: always
+
+  configure-infrastructure:
+    docker:
+      - image: python:3.9-bullseye
+    steps:
+      - checkout    # Checkout code from git
+      - add_ssh_keys:
+          fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb"  # Add ssh keys with fingerprint
+      - attach_workspace:
+          at: ~/    # attach workspace
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update -y && apt-get install ansible -y
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible && \
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment   # rollback on failure  
+      - slack/notify:
+          event: always
+      # Here's where you will add some code to rollback on failure      
 
 
 
@@ -182,4 +205,6 @@ workflows:
           filters:
             branches:
               only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
 
