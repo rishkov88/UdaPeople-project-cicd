@@ -175,19 +175,18 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.9-bullseye
     steps:
       - checkout    # Checkout code from git
       - add_ssh_keys:
           fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb"  # Add ssh keys with fingerprint
+#      - run: yum install tar -y && yum install gzip -y
       - attach_workspace:
           at: ~/    # attach workspace
       - run:
           name: Install dependencies
           command: |
-            yum install ansible -y
-            yum install tar -y
-            yum install gzip -y
+            apt-get install ansible -y
       - run:
           name: Configure server
           command: |
