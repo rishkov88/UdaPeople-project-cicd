@@ -18,6 +18,7 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.to >> && \
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.to >>
+
 jobs:
   build-frontend:
     docker:
@@ -125,9 +126,8 @@ jobs:
           event: fail
 
   deploy-infrastructure:
-    docker:
-      docker: 
-        - image: amazon/aws-cli    # Docker image here that supports AWS CLI
+    docker: 
+      - image: amazon/aws-cli    # Docker image here that supports AWS CLI
     steps:
       - checkout    # Checkout code from git
       - run:
