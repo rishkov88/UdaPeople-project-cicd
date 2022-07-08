@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   slack: circleci/slack@4.10.1
-    
+
 jobs:
   build-frontend:
     docker:
@@ -23,7 +23,6 @@ jobs:
           key: frontend-build
       - slack/notify:
           event: fail
-          context: slack-notif
 
   build-backend:
     docker:
@@ -43,7 +42,6 @@ jobs:
           key: backend-build
       - slack/notify:
           event: fail
-          context: slack-notif
 
   test-frontend:
     docker:
@@ -60,7 +58,6 @@ jobs:
             npm run test
       - slack/notify:
           event: fail
-          context: slack-notif
                 
   test-backend:
     docker:
@@ -77,7 +74,6 @@ jobs:
             npm run test
       - slack/notify:
           event: fail
-          context: slack-notif
 
   scan-frontend:
     docker:
@@ -95,7 +91,6 @@ jobs:
             npm audit --audit-level=critical
       - slack/notify:
           event: fail
-          context: slack-notif
      
   scan-backend:
     docker:
@@ -114,10 +109,7 @@ jobs:
             npm audit --audit-level=critical
       - slack/notify:
           event: fail
-          context: slack-notif
-            
-            
-
+   
 workflows:
   default:
     jobs:
