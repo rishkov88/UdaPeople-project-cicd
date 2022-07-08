@@ -2,30 +2,6 @@ version: 2.1
 
 orbs:
   slack: circleci/slack@4.10.1
-
-commands:
-  notify:
-      docker:
-        - image: 'cimg/base:stable'
-      steps:
-        - slack/notify:
-            when: on_fail
-            custom: |
-              {
-                "blocks": [
-                  {
-                    "type": "section",
-                    "fields": [
-                      {
-                        "type": "plain_text",
-                        "text": "Your ${CIRCLE_JOB} job as fail ",
-                        "emoji": true
-                      }
-                    ]
-                  }
-                ]
-              }
-            event: always
     
 jobs:
   build-frontend:
@@ -45,7 +21,8 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - notify:
+      - notify/slack:
+          event: fail
           context: slack-notif
 
   build-backend:
@@ -64,6 +41,9 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - notify/slack:
+          event: fail
+          context: slack-notif
 
   test-frontend:
     docker:
@@ -78,6 +58,9 @@ jobs:
             cd frontend   
             npm install   
             npm run test
+      - notify/slack:
+          event: fail
+          context: slack-notif
                 
   test-backend:
     docker:
@@ -92,6 +75,9 @@ jobs:
             cd backend   
             npm install   
             npm run test
+      - notify/slack:
+          event: fail
+          context: slack-notif
 
   scan-frontend:
     docker:
@@ -107,6 +93,9 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - notify/slack:
+          event: fail
+          context: slack-notif
      
   scan-backend:
     docker:
@@ -123,6 +112,9 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - notify/slack:
+          event: fail
+          context: slack-notif
             
             
 
