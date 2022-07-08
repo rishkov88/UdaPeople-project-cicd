@@ -135,7 +135,8 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/backend.yml \
             --tags project=udapeople \
-            --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+#            --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --stack-name frontend-backend-${CIRCLE_PROJECT_REPONAME} \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} 
 
       - run:
@@ -144,7 +145,8 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/frontend.yml \
             --tags project=udapeople \
-            --stack-name frontend-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+#            --stack-name frontend-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --stack-name frontend-frontend-${CIRCLE_PROJECT_REPONAME} \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}  
               
       - run:
@@ -164,10 +166,12 @@ jobs:
           event: fail
 
       - destroy-environment:
-          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}    # rollback on failure 
+#          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}    # rollback on failure 
 
       - destroy-environment:
-          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}     # rollback on failure 
+#          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}     # rollback on failure 
 
   configure-infrastructure:
     docker:
@@ -176,13 +180,13 @@ jobs:
       - checkout    # Checkout code from git
       - add_ssh_keys:
           fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb"  # Add ssh keys with fingerprint
-      - run: apt-get install tar -y
+      - run: yum install tar -y
       - attach_workspace:
           at: ~/    # attach workspace
       - run:
           name: Install dependencies
           command: |
-            apt-get update -y && apt-get install ansible -y
+            yum update -y && yum install ansible -y
       - run:
           name: Configure server
           command: |
@@ -193,10 +197,12 @@ jobs:
           event: always
 
       - destroy-environment:
-          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+#          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}
 
       - destroy-environment:
-          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+#          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}
       # Here's where you will add some code to rollback on failure      
 
 
