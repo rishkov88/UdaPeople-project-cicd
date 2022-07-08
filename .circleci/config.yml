@@ -9,15 +9,14 @@ commands:
     parameters: # Add parameter here
       to: 
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}  
+       # default: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}  
     steps:
       - run:
           name: Destroy environments
           when: on_fail
 #          command: echo "bravo, vous avez échoué le server"
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.to >> && \
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.to >>
+            aws cloudformation delete-stack --stack-name << parameters.to >>
 
 jobs:
   build-frontend:
@@ -153,22 +152,31 @@ jobs:
           command: |
             aws ec2 describe-instances --query \
             "Reservations[*].Instances[*].PublicIpAddress" --output text >> .circleci/ansible/inventory.txt
+
       - run:  yum install tar -y && yum install gzip -y
+
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment   # rollback on failure  
+
       - slack/notify:
-          event: always
+          event: fail
+
+      - destroy-environment:
+          to: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"    # rollback on failure 
+
+      - destroy-environment:
+          to: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"     # rollback on failure 
 
   configure-infrastructure:
     docker:
-      - image: python:3.9-bullseye
+      - image: amazon/aws-cli
     steps:
       - checkout    # Checkout code from git
       - add_ssh_keys:
           fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb"  # Add ssh keys with fingerprint
+
       - attach_workspace:
           at: ~/    # attach workspace
       - run:
@@ -179,10 +187,16 @@ jobs:
           name: Configure server
           command: |
             cd .circleci/ansible && \
-            ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment   # rollback on failure  
+            ansible-playbook -i inventory.txt configure-server.yml 
+
       - slack/notify:
           event: always
+
+      - destroy-environment:
+          to: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+
+      - destroy-environment:
+          to: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
       # Here's where you will add some code to rollback on failure      
 
 
