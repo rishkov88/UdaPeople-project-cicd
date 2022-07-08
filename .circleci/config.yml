@@ -1,5 +1,32 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.10.1
+
+commands:
+  notify:
+      docker:
+        - image: 'cimg/base:stable'
+      steps:
+        - slack/notify:
+            when: on_fail
+            custom: |
+              {
+                "blocks": [
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "plain_text",
+                        "text": "Your ${CIRCLE_JOB} job as fail ",
+                        "emoji": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            event: always
+    
 jobs:
   build-frontend:
     docker:
@@ -11,12 +38,15 @@ jobs:
       - run:    # job code
           name: Build front-end
           command: |
+            return 1
             cd frontend
             npm install
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - notify:
+          context: slack-notif
 
   build-backend:
     docker:
