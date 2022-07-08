@@ -6,17 +6,18 @@ orbs:
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here   
+    parameters: # Add parameter here
+      to: 
+      type: string
+      default: ${CIRCLE_WORKFLOW_ID:0:7}  
     steps:
       - run:
           name: Destroy environments
           when: on_fail
 #          command: echo "bravo, vous avez échoué le server"
           command: |
-            aws cloudformation delete-stack --stack-name infra-${CIRCLE_WORKFLOW_ID:0:7} && \
-            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.to >> && \
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.to >>
 jobs:
   build-frontend:
     docker:
@@ -133,19 +134,19 @@ jobs:
           name: Ensure back-end infrastructure exists
           command: |
             aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
-              --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} 
+            --template-file .circleci/files/backend.yml \
+            --tags project=udapeople \
+            --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} 
 
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
-              --stack-name frontend-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}  
+            --template-file .circleci/files/frontend.yml \
+            --tags project=udapeople \
+            --stack-name frontend-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}  
               
       - run:
           name: Add public ip to ansible inventory
@@ -158,6 +159,8 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment # Here's where you will add some code to rollback on failure  
+      - slack/notify:
+          event: always
 
 
 
