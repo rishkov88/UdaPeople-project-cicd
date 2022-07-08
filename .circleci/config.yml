@@ -21,7 +21,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - notify/slack:
+      - slack/notify:
           event: fail
           context: slack-notif
 
@@ -41,7 +41,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - notify/slack:
+      - slack/notify:
           event: fail
           context: slack-notif
 
@@ -58,7 +58,7 @@ jobs:
             cd frontend   
             npm install   
             npm run test
-      - notify/slack:
+      - slack/notify:
           event: fail
           context: slack-notif
                 
@@ -75,7 +75,7 @@ jobs:
             cd backend   
             npm install   
             npm run test
-      - notify/slack:
+      - slack/notify:
           event: fail
           context: slack-notif
 
@@ -93,7 +93,7 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - notify/slack:
+      - slack/notify:
           event: fail
           context: slack-notif
      
@@ -112,7 +112,7 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - notify/slack:
+      - slack/notify:
           event: fail
           context: slack-notif
             
