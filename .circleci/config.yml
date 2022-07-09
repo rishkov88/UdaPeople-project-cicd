@@ -188,7 +188,6 @@ jobs:
             apt-get update
             apt-get install ansible -y
             apt-get install awscli -y
-      - run: cat ~/project/.circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
