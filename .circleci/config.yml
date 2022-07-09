@@ -26,10 +26,10 @@ commands:
     steps:
       - run:
           name: Revert migrations
-          # Add when this will run
+          when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            SUCCESS=(curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -174,8 +174,7 @@ jobs:
           name: Add public ip to ansible inventory
           command: |
             aws ec2 describe-instances --query \
-            "Reservations[*].Instances[*].PublicIpAddress" --output text \
-            --filter "Name=tag:project,Values:udapeople" >> ~/project/.circleci/ansible/inventory.txt
+            "Reservations[*].Instances[*].PublicIpAddress" --filter "Name=tag:project,Values:udapeople" --output text >> ~/project/.circleci/ansible/inventory.txt
       - run:  yum install tar -y && yum install gzip -y
       - persist_to_workspace:
           root: ~/
@@ -278,7 +277,12 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # Here's where you will add some code to rollback on failure 
+       - destroy-environment:
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations
+    #  Here's where you will add some code to rollback on failure 
 
 
 workflows:
@@ -304,4 +308,4 @@ workflows:
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
-          requires: [run-migrations]
+          requires: [run-migrations, configure-infrastructure]
