@@ -19,17 +19,17 @@ commands:
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
-    parameters:
-      to:
-        type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}
+    # parameters:
+    #   to:
+    #     type: string
+    #     default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_<< parameters.to >>)
+            SUCCESS=$(curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            echo "value=$SUCCESS"
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -382,6 +382,22 @@ jobs:
       - destroy-environment:
           to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations 
+
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/cloudfront.yml \
+            --stack-name InitialStack \
+            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --tags project=udapeople
+      # Here's where you will add some code to rollback on failure  
+
  
   
 workflows:
@@ -412,3 +428,5 @@ workflows:
           requires: [run-migrations, configure-infrastructure]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
