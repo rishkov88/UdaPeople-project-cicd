@@ -104,6 +104,9 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-scan
       - slack/notify:
           event: fail
      
@@ -122,6 +125,9 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-scan
       - slack/notify:
           event: fail
 
@@ -212,15 +218,12 @@ jobs:
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-scan]
       - run:
           name: Run migrations
           command: |
             cd backend
             npm install
-            npm audit fix --audit-level=critical --force
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
             npm run migrations > migrations_dump.txt
       - run: cat migrations_dump.txt
 #          name: Send migration results to memstash
