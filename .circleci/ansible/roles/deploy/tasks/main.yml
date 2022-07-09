@@ -19,7 +19,7 @@
   become: true
   shell: npm install pm2 -g
 
-name: "create directory"
+- name: "create directory"
   become: true
   file:
       path: ~/backend
