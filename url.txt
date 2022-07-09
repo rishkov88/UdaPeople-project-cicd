@@ -1,5 +1,10 @@
 url01 GitHub repository
 https://github.com/rishkov88/UdaPeople-project-cicd
 
+#################""
+bucket kvdb: 15H2YaTZdxuPbnTP6Y4JDRGx
+
+
+
  "class-validator": "^0.9.1",
      "standard-version": "^4.4.0",
