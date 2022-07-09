@@ -44,12 +44,12 @@ commands:
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
+      - image: circleci/node:13.8.0 
     steps:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - run:    # job code
+      - run:    
           name: Build front-end
           command: |
             cd frontend
@@ -63,12 +63,12 @@ jobs:
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
+      - image: circleci/node:13.8.0  
     steps:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run:    # job code
+      - run:    
           name: Back-end build
           command: |
             cd backend
@@ -82,12 +82,12 @@ jobs:
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
+      - image: circleci/node:13.8.0   
     steps:
-      - checkout    # Checkout code from git
+      - checkout    
       - restore_cache:
-          keys: [frontend-build]    # Restore from cache
-      - run:    # job code
+          keys: [frontend-build]    
+      - run:    
           name: Test front-end
           command: |
             cd frontend   
@@ -98,12 +98,12 @@ jobs:
                 
   test-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
+      - image: circleci/node:13.8.0   
     steps:
-      - checkout    # Checkout code from git
+      - checkout    
       - restore_cache:
-          keys: [backend-build]    # Restore from cache
-      - run:    # job code
+          keys: [backend-build]    
+      - run:    
           name: Test back-end
           command: |
             cd backend   
@@ -114,12 +114,12 @@ jobs:
 
   scan-frontend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
+      - image: circleci/node:13.8.0   
     steps:
-      - checkout    # Checkout code from git
+      - checkout    
       - restore_cache:
-          keys: [frontend-build]    # Restore from cache
-      - run:    # job code
+          keys: [frontend-build]    
+      - run:    
           name: Front-end Scan
           command: |
             cd frontend
@@ -131,12 +131,12 @@ jobs:
      
   scan-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image  that supports NodeJS
+      - image: circleci/node:13.8.0  
     steps:
-      - checkout    # Checkout code from git
+      - checkout   
       - restore_cache:
-          keys: [backend-build]    # Restore from cache
-      - run:    # job code
+          keys: [backend-build]   
+      - run:   
           name: Back-end Scan
           command: |
             cd backend
@@ -149,9 +149,9 @@ jobs:
 
   deploy-infrastructure:
     docker: 
-      - image: amazon/aws-cli    # Docker image that supports AWS CLI
+      - image: amazon/aws-cli  
     steps:
-      - checkout    # Checkout code from git
+      - checkout    
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -160,7 +160,8 @@ jobs:
             --tags project=udapeople \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
            --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-            # --stack-name udapeople-backend-${CIRCLE_PROJECT_REPONAME} \   
+           
+      # --stack-name udapeople-backend-${CIRCLE_PROJECT_REPONAME} \   
 
       - run:
           name: Ensure front-end infrastructure exist
@@ -170,7 +171,8 @@ jobs:
             --tags project=udapeople \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}
            --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
-            # --stack-name udapeople-frontend-${CIRCLE_PROJECT_REPONAME} \
+
+      # --stack-name udapeople-frontend-${CIRCLE_PROJECT_REPONAME} \
               
       - run:
           name: Add public ip to ansible inventory
@@ -190,20 +192,20 @@ jobs:
           event: fail
 
       - destroy-environment:
-          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}    # rollback on failure 
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}    
 
       - destroy-environment:
-          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}    # rollback on failure 
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}    
 
   configure-infrastructure:
     docker:
       - image: python:3.9-bullseye
     steps:
-      - checkout    # Checkout code from git
+      - checkout  
       - add_ssh_keys:
-          fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb" # Add ssh keys with fingerprint
+          fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb" 
       - attach_workspace:
-          at: ~/    # attach workspace
+          at: ~/   
       - run:
           name: Install dependencies
           command: |
@@ -227,9 +229,9 @@ jobs:
 
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
+      - image: circleci/node:13.8.0   
     steps:
-      - checkout    # Checkout code from git
+      - checkout    
       - restore_cache:
           keys: [backend-build]
       - run:
