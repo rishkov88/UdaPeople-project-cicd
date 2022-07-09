@@ -216,11 +216,18 @@ jobs:
 
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0   
+      - image: python:3.9-bullseye   
     steps:
       - checkout    
       - restore_cache:
           keys: [backend-build]
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update -y
+            apt-get install nodejs -y
+            apt-get install npm -y
+            apt-get install awscli -y
       - run:
           name: Run migrations
           command: |
@@ -238,10 +245,10 @@ jobs:
             fi
       - run: curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}
       
-      # - destroy-environment:
-      #     to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-      # - destroy-environment:
-      #     to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
@@ -277,11 +284,11 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment:
-          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-      - destroy-environment:
-          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations
+      # - destroy-environment:
+      #     to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      # - destroy-environment:
+      #     to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      # - revert-migrations
 
 
 workflows:
