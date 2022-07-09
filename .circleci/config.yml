@@ -219,7 +219,7 @@ jobs:
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
-          keys: [backend-scan]
+          keys: [backend-build]
       - run:
           name: Run migrations
           command: |
