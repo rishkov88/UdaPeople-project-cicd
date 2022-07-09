@@ -31,11 +31,12 @@ name: "create directory"
       src: artifact.tar.gz
       dest: ~/backend/artifact.tar.gz
 
-- name: "unarchive"
+- name: "unarchive artifact"
   become: true
   shell: |
       cd ~/backend
       tar xvfz artifact.tar.gz
+
 - name: "start web server"
   become: true
   shell: |
