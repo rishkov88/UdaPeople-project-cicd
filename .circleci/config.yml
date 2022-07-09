@@ -18,6 +18,28 @@ commands:
 #          command: |
 #            aws cloudformation delete-stack --stack-name << parameters.to >>
 
+    revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      to:     
+    steps:
+      - run:
+          name: Revert migrations
+          # Add when this will run
+          command: |
+            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+            SUCCESS=curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            if(( $SUCCESS==1 )); 
+            then
+              cd ~/project/backend
+              npm install
+              npm run migrations:revert
+
+            #  Add revert code here. You can find this in the Getting Started section.
+              exit 1
+            fi
+            
+
 
 jobs:
   build-frontend:
@@ -136,9 +158,9 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/backend.yml \
             --tags project=udapeople \
-            --stack-name udapeople-backend-${CIRCLE_PROJECT_REPONAME} \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
-#            --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \     
+           --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+            # --stack-name udapeople-backend-${CIRCLE_PROJECT_REPONAME} \   
 
       - run:
           name: Ensure front-end infrastructure exist
@@ -146,9 +168,9 @@ jobs:
             aws cloudformation deploy \
             --template-file .circleci/files/frontend.yml \
             --tags project=udapeople \
-            --stack-name udapeople-frontend-${CIRCLE_PROJECT_REPONAME} \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}
-#            --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+           --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+            # --stack-name udapeople-frontend-${CIRCLE_PROJECT_REPONAME} \
               
       - run:
           name: Add public ip to ansible inventory
@@ -168,12 +190,10 @@ jobs:
           event: fail
 
       - destroy-environment:
-#          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-          to: udapeople-frontend-${CIRCLE_PROJECT_REPONAME}    # rollback on failure 
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}    # rollback on failure 
 
       - destroy-environment:
-#          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}     # rollback on failure 
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}    # rollback on failure 
 
   configure-infrastructure:
     docker:
@@ -200,12 +220,10 @@ jobs:
           event: always
 
       - destroy-environment:
-#          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-          to: udapeople-frontend-${CIRCLE_PROJECT_REPONAME}
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
       - destroy-environment:
-#          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-          to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
 
   run-migrations:
     docker:
@@ -228,9 +246,9 @@ jobs:
             if grep -q "migrations are pending" ~/project/backend/migrations_dump.txt
             then
                 # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-                curl --insecure https://kvdb.io/15H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+                curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
-      - run: curl --insecure https://kvdb.io/15H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}
+      - run: curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}
       
       # - destroy-environment:
       #     to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
@@ -238,7 +256,40 @@ jobs:
       #     to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
      # Here's where you will add some code to rollback on failure      
 
-
+  deploy-frontend:
+    docker:
+      - image: python:3.9-bullseye 
+    steps:
+      - checkout   
+      - attach_workspace:
+          at: ~/    
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update -y
+            apt-get install nodejs -y
+            apt-get install npm -y
+            apt-get install awscli -y
+            apt-get install ansible -y
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances --query \
+            "Reservations[*].Instances[*].PublicIpAddress" --output text \
+            --filters "Name=tag:project,Values:udapeople")
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+      - run:
+          name: Deploy frontend objects
+          command: |
+            cd frontend
+            npm install
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure 
 
 
 workflows:
