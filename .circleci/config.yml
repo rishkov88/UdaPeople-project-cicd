@@ -324,6 +324,7 @@ jobs:
       - run: 
           name: clean up s3 bucket
           command: aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+          when: on_fail
       - destroy-environment:
           to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment:
