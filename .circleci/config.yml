@@ -153,7 +153,7 @@ jobs:
           name: Add public ip to ansible inventory
           command: |
             aws ec2 describe-instances --query \
-            "Reservations[*].Instances[*].PublicIpAddress" --output text >> .circleci/ansible/inventory.txt
+            "Reservations[*].Instances[*].PublicIpAddress" --output text >> ~/project/.circleci/ansible/inventory.txt
 
       - run:  yum install tar -y && yum install gzip -y
 
@@ -180,7 +180,6 @@ jobs:
       - checkout    # Checkout code from git
       - add_ssh_keys:
           fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb"  # Add ssh keys with fingerprint
-#      - run: yum install tar -y && yum install gzip -y
       - attach_workspace:
           at: ~/    # attach workspace
       - run:
@@ -189,10 +188,11 @@ jobs:
             apt-get update
             apt-get install ansible -y
             apt-get install awscli -y
+      - run: cat ~/project/.circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
-            cd .circleci/ansible && \
+            cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml 
 
       - slack/notify:
