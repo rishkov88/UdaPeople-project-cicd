@@ -18,27 +18,27 @@ commands:
 #          command: |
 #            aws cloudformation delete-stack --stack-name << parameters.to >>
 
-    revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
-    parameters:
-      to:     
-    steps:
-      - run:
-          name: Revert migrations
-          # Add when this will run
-          command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}
-            if(( $SUCCESS==1 )); 
-            then
-              cd ~/project/backend
-              npm install
-              npm run migrations:revert
+  revert-migrations:
+  description: Revert the last migration if successfully run in the current workflow.
+  parameters:
+    to:     
+  steps:
+    - run:
+        name: Revert migrations
+        # Add when this will run
+        command: |
+          # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+          SUCCESS=curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7}
+          if(( $SUCCESS==1 )); 
+          then
+            cd ~/project/backend
+            npm install
+            npm run migrations:revert
 
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
-            fi
-            
+          #  Add revert code here. You can find this in the Getting Started section.
+            exit 1
+          fi
+          
 
 
 jobs:
