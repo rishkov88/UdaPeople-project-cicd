@@ -14,15 +14,35 @@ commands:
       - run:
           name: Destroy environments
           when: on_fail
-#          command: echo "bravo, vous avez échoué le server"
-          command: |
-            aws cloudformation delete-stack --stack-name << parameters.to >>
+          command: echo "bravo, vous avez échoué le server"
+#          command: |
+#            aws cloudformation delete-stack --stack-name << parameters.to >>
 
+  revert-migrations:
+      description: Revert the last migration if successfully run in the current workflow.
+      parameters:
+        # Add parameter here     
+      steps:
+        - run:
+            name: Revert migrations
+            # Add when this will run
+            command: |
+              # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+              SUCCESS = 1
+              if(( $SUCCESS==1 )); 
+              then
+              #  cd ~/project/backend
+              #  npm install
+              #  Add revert code here. You can find this in the Getting Started section.
+                exit 1
+              fi
+              
+              
 
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image
+      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
     steps:
       - checkout
       - restore_cache:
@@ -41,7 +61,7 @@ jobs:
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image
+      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
     steps:
       - checkout
       - restore_cache:
@@ -60,7 +80,7 @@ jobs:
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image
+      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
@@ -76,7 +96,7 @@ jobs:
                 
   test-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image
+      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
@@ -92,7 +112,7 @@ jobs:
 
   scan-frontend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image
+      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
@@ -109,7 +129,7 @@ jobs:
      
   scan-backend:
     docker:
-      - image: circleci/node:13.8.0   # Docker image 
+      - image: circleci/node:13.8.0   # Docker image  that supports NodeJS
     steps:
       - checkout    # Checkout code from git
       - restore_cache:
@@ -206,6 +226,26 @@ jobs:
 #          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
           to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}
 
+  run-migrations:
+    docker:
+      docker:
+      - image: circleci/node:13.8.0   # Docker image that supports NodeJS
+    steps:
+      - checkout    # Checkout code from git
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            npm install
+            npm run migrations > migrations_dump.txt
+      - run: cat migrations_dump.txt
+#          name: Send migration results to memstash
+#          command: |
+            # Your code here
+#            exit 1
+     # Here's where you will add some code to rollback on failure      
 
 
 
@@ -223,11 +263,14 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
+      #- deploy-infrastructure:
+      #    requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #    filters:
+      #      branches:
+      #        only: [master]
+      #- configure-infrastructure:
+      #    requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [build-backend]
+      #    requires: [configure-infrastructure]
 
