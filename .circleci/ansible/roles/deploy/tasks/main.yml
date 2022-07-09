@@ -19,19 +19,23 @@
   become: true
   shell: npm install pm2 -g
 
+name: "create directory"
+  become: true
+  file:
+      path: ~/backend
+      state: directory
+
 - name: "push zip files"
   become: true
   copy:
       src: artifact.tar.gz
-      dest: ~/artifact.tar.gz
+      dest: ~/backend/artifact.tar.gz
 
 - name: "unarchive"
   become: true
   shell: |
-      cd ~/
+      cd ~/backend
       tar xvfz artifact.tar.gz
-      mv artifact backend
-
 - name: "start web server"
   become: true
   shell: |
