@@ -18,6 +18,7 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name << parameters.to >>
 
+
 jobs:
   build-frontend:
     docker:
@@ -179,7 +180,7 @@ jobs:
     steps:
       - checkout    # Checkout code from git
       - add_ssh_keys:
-          fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb"  # Add ssh keys with fingerprint
+          fingerprints: "3c:52:00:17:bd:c5:bc:1c:96:3e:7f:0e:00:17:a4:eb" # Add ssh keys with fingerprint
       - attach_workspace:
           at: ~/    # attach workspace
       - run:
@@ -204,7 +205,8 @@ jobs:
       - destroy-environment:
 #          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
           to: udapeople-backend-${CIRCLE_PROJECT_REPONAME}
-      # Here's where you will add some code to rollback on failure      
+
+
 
 
 

@@ -2,7 +2,7 @@
 
 - name: "configuration play." 
   hosts: web
-  user: debian
+  user: admin
   become: true
   become_method: sudo
   become_user: root  
