@@ -320,7 +320,15 @@ jobs:
             mkdir roles/deploy/files
             cp artifact.tar.gz roles/deploy/files/
             cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml    
+            ansible-playbook -i inventory.txt deploy-backend.yml   
+      - run: 
+          name: clean up s3 bucket
+          command: aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+      - destroy-environment:
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations
       # Here's where you will add some code to rollback on failure  
 
 
