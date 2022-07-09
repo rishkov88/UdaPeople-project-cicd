@@ -284,11 +284,45 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # - destroy-environment:
-      #     to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-      # - destroy-environment:
-      #     to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      # - revert-migrations
+      - destroy-environment:
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations
+
+  deploy-backend:
+    docker:
+      - image: python:3.9-bullseye 
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/    
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update -y
+            apt-get install nodejs -y
+            apt-get install npm -y
+            apt-get install awscli -y
+            apt-get install ansible -y
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+      - run: 
+          name: deploy artifacts  # Zip the directory
+          command:
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            mkdir roles/deploy/files
+            cp artifact.tar.gz roles/deploy/files/
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml    
+      # Here's where you will add some code to rollback on failure  
+
 
 
 workflows:
