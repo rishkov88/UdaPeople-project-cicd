@@ -14,9 +14,8 @@ commands:
       - run:
           name: Destroy environments
           when: on_fail
-          command: echo "bravo, vous avez échoué le server"
-#          command: |
-#            aws cloudformation delete-stack --stack-name << parameters.to >>
+          command: |
+            aws cloudformation delete-stack --stack-name << parameters.to >>
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -174,7 +173,8 @@ jobs:
           name: Add public ip to ansible inventory
           command: |
             aws ec2 describe-instances --query \
-            "Reservations[*].Instances[*].PublicIpAddress" --filter "Name=tag:project,Values:udapeople" --output text >> ~/project/.circleci/ansible/inventory.txt
+            "Reservations[*].Instances[*].PublicIpAddress" --filter "Name=tag:project,Values=udapeople" \
+            --output text >> ~/project/.circleci/ansible/inventory.txt
       - run:  yum install tar -y && yum install gzip -y
       - persist_to_workspace:
           root: ~/
