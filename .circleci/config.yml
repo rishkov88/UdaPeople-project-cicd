@@ -6,9 +6,9 @@ orbs:
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters: # Add parameter here
-      to: 
-        type: string
+    # parameters: # Add parameter here
+    #   to: 
+    #     type: string
        # default: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}  
     steps:
       - run:
@@ -282,7 +282,6 @@ jobs:
       - destroy-environment:
           to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations
-    #  Here's where you will add some code to rollback on failure 
 
 
 workflows:
