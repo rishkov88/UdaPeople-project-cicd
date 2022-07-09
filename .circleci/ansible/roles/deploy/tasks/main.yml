@@ -28,7 +28,7 @@ name: "create directory"
 - name: "push zip files"
   become: true
   copy:
-      src: artifact.tar.gz
+      src: ~/project/artifact.tar.gz
       dest: ~/backend/artifact.tar.gz
 
 - name: "unarchive artifact"

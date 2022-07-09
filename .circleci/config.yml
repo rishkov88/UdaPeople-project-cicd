@@ -313,12 +313,13 @@ jobs:
             npm run build
             cd ..
       - run: 
-          name: deploy artifacts  # Zip the directory
+          name:  zip backend # Zip the directory
           command: |
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
-            mkdir roles/deploy/files
-            cp artifact.tar.gz roles/deploy/files/
+      - run:
+          name: deploy artifacts            # mkdir roles/deploy/files # cp artifact.tar.gz roles/deploy/files/artifact.tar.gz
+          command: |
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml   
       - run: 
