@@ -28,8 +28,7 @@
 - name: "unarchive artifact"
   become: true
   shell: |
-      cd ~/backend
-      tar xvfz artifact.tar.gz
+      cd ~/backend && tar xvfz artifact.tar.gz
 
 - name: "push zip files"
   become: true
