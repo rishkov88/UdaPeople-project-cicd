@@ -205,7 +205,7 @@ jobs:
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml 
       - slack/notify:
-          event: always
+          event: fail
       - destroy-environment:
           to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment:
@@ -365,8 +365,9 @@ jobs:
               if curl -s ${URL} | grep "Welcome"
               then
                   # Change this to 0 after the job fails
-                exit 1
+                
               else
+                echo "Frontend smoke test failed"
                 exit 1
               fi
       - run: 
