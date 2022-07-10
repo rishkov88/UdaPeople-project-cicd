@@ -35,12 +35,6 @@
   become: true
   shell: |
       cp ~/backend/development.env ~/backend/.env
-      
-- name: "copy env file"
-  become: true
-  copy:
-      src: ~/project/backend/.env
-      dest: ~/backend/.env
 
 - name: "start web server"
   become: true
