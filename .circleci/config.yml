@@ -19,16 +19,16 @@ commands:
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
-    # parameters:
-    #   to:
-    #     type: string
-    #     default: ${CIRCLE_WORKFLOW_ID:0:7}
+    parameters:
+      to:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS=$(curl --insecure https://kvdb.io/H2YaTZdxuPbnTP6Y4JDRGx/migration_<< parameters.to >>)
             echo "value=$SUCCESS"
             if(( $SUCCESS==1 )); 
             then
@@ -335,13 +335,18 @@ jobs:
 
   smoke-test:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.9-bullseye 
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/    
       - run:
           name: Install dependencies
           command: |
-            yum install curl -y
+            apt-get update -y
+            apt-get install nodejs -y
+            apt-get install npm -y
+            apt-get install awscli -y
       - run:
           name: Get backend url
           command: |
