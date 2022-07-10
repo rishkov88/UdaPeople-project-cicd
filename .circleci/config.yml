@@ -395,7 +395,7 @@ jobs:
             apt-get install awscli -y
       - attach_workspace:
           at: ~/
-      -run: 
+      - run: 
           name:
           command: |
             aws cloudformation \
