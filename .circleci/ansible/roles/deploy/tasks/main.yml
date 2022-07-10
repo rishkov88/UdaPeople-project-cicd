@@ -27,10 +27,9 @@
 
 - name: "push zip files"
   become: true
-  copy:
-      src: ~/project/artifact.tar.gz
-      dest: ~/backend/artifact.tar.gz
-
+  shell: |
+      cp ~/backend/development.env ~/backend/.env
+      
 - name: "unarchive artifact"
   become: true
   shell: |
