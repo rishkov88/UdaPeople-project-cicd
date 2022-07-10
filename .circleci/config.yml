@@ -431,7 +431,7 @@ jobs:
       - run:
           name: Remove old stacks and files
           command: |
-            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+            if [[ "udapeople-${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
               then
                 echo "******************Delete Bleue Version Confirmed*********************"
                 aws s3 rm "s3://${OldWorkflowID}" --recursive
@@ -447,50 +447,51 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend:
-          filters:
-           branches:
-             only: [master, dev-branch]
-      - build-backend:
-          filters:
-           branches:
-             only: [master, dev-branch]
-      - test-frontend:
-          requires: [build-frontend]
-          filters:
-           branches:
-             only: [master, dev-branch]
-      - test-backend:
-          requires: [build-backend]
-          filters:
-           branches:
-             only: [master, dev-branch]
-      - scan-backend:
-          requires: [build-backend]
-          filters:
-           branches:
-             only: [master, dev-branch]
-      - scan-frontend:
-          requires: [build-frontend]
-          filters:
-           branches:
-             only: [master, dev-branch]
-      - deploy-infrastructure:
-         requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-         filters:
-           branches:
-             only: [master]
-      - configure-infrastructure:
-         requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations, configure-infrastructure]
-      - deploy-backend:
-          requires: [run-migrations, configure-infrastructure]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      # - build-frontend:
+      #     filters:
+      #      branches:
+      #        only: [master, dev-branch]
+      # - build-backend:
+      #     filters:
+      #      branches:
+      #        only: [master, dev-branch]
+      # - test-frontend:
+      #     requires: [build-frontend]
+      #     filters:
+      #      branches:
+      #        only: [master, dev-branch]
+      # - test-backend:
+      #     requires: [build-backend]
+      #     filters:
+      #      branches:
+      #        only: [master, dev-branch]
+      # - scan-backend:
+      #     requires: [build-backend]
+      #     filters:
+      #      branches:
+      #        only: [master, dev-branch]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      #     filters:
+      #      branches:
+      #        only: [master, dev-branch]
+      # - deploy-infrastructure:
+      #    requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #    filters:
+      #      branches:
+      #        only: [master]
+      # - configure-infrastructure:
+      #    requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations, configure-infrastructure]
+      # - deploy-backend:
+      #     requires: [run-migrations, configure-infrastructure]
+      # - smoke-test:
+      #     requires: [deploy-backend, deploy-frontend]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
+      # - cleanup:
+      #     requires: [cloudfront-update]
+      - deploy-infrastructure
