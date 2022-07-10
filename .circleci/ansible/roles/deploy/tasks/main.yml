@@ -25,17 +25,17 @@
       path: ~/backend
       state: directory
 
-- name: "push zip files"
-  become: true
-  shell: |
-      cp ~/backend/development.env ~/backend/.env
-      
 - name: "unarchive artifact"
   become: true
   shell: |
       cd ~/backend
       tar xvfz artifact.tar.gz
 
+- name: "push zip files"
+  become: true
+  shell: |
+      cp ~/backend/development.env ~/backend/.env
+      
 - name: "copy env file"
   become: true
   copy:
