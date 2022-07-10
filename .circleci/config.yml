@@ -369,16 +369,16 @@ jobs:
               else
                 exit 1
               fi
-      # - run: 
-      #     name: clean up s3 bucket
-      #     command: |
-      #       aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive && aws s3 ls
-      #     when: on_fail
-      # - destroy-environment:
-      #     to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-      # - destroy-environment:
-      #     to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-      # - revert-migrations 
+      - run: 
+          name: clean up s3 bucket
+          command: |
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive && aws s3 ls
+          when: on_fail
+      - destroy-environment:
+          to: udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment:
+          to: udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations 
 
   cloudfront-update:
     docker:
