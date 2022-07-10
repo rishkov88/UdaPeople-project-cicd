@@ -361,7 +361,6 @@ jobs:
                 echo "Backend smoke test failed"
                 return 1
             fi
-            # your code here
       - run:
           name: Frontend smoke test.
           command: |
