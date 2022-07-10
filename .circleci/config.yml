@@ -495,10 +495,10 @@ workflows:
          requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations, configure-infrastructure]
       - deploy-backend:
           requires: [run-migrations, configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations, configure-infrastructure, deploy-backend]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
