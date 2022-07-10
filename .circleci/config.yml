@@ -173,6 +173,12 @@ jobs:
             "Reservations[*].Instances[*].PublicIpAddress" --filter "Name=tag:project,Values=udapeople" \
             --output text >> ~/project/.circleci/ansible/inventory.txt
       - run:  yum install tar -y && yum install gzip -y && touch ~/project/.circleci/ansible/OldWorkflowID.txt
+      - run: 
+          name: save old workflowid
+          command: |
+            aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text > ~/project/.circleci/ansible/OldWorkflowID.txt
+            aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text
+            cat ~/project/.circleci/ansible/OldWorkflowID.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -393,14 +399,6 @@ jobs:
             apt-get install nodejs -y
             apt-get install npm -y
             apt-get install awscli -y
-      - attach_workspace:
-          at: ~/
-      - run: 
-          name: save old workflowid
-          command: |
-            aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text > ~/project/.circleci/ansible/OldWorkflowID.txt
-            aws cloudformation list-exports --query "Exports[?Name==\`WorkflowID\`].Value" --no-paginate --output text
-            cat ~/project/.circleci/ansible/OldWorkflowID.txt
       - run:
           name: Update cloudfront distribution
           command: |
@@ -422,14 +420,14 @@ jobs:
        
   cleanup:
     docker:
-      - image: python:3.9-bullseye
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run: 
           name: install dependencies
           command: |
-            apt-get update -y
-            apt-get install awscli -y
+            yum install tar -y 
+            yum install gzip -y
       - attach_workspace:
           at: ~/
       - run:
