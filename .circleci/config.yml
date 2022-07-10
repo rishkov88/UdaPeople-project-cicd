@@ -422,14 +422,14 @@ jobs:
        
   cleanup:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.9-bullseye
     steps:
       - checkout
       - run: 
           name: install dependencies
           command: |
-            yum install tar -y 
-            yum install gzip -y
+            apt-get update -y
+            apt-get install awscli -y
       - attach_workspace:
           at: ~/
       - run:
