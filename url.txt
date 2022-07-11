@@ -2,4 +2,4 @@ url01 GitHub repository:
 https://github.com/rishkov88/UdaPeople-project-cicd
 
 url02 public url:
-
+d12i6d3blxov6f.cloudfront.net
