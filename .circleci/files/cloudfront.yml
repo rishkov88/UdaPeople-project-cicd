@@ -26,6 +26,7 @@ Resources:
               HTTPPort: 80
               HTTPSPort: 443
               OriginProtocolPolicy: http-only
+            #  OriginProtocolPolicy: http-only
             # S3OriginConfig:
             #   OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
         Enabled: True
