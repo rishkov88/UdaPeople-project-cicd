@@ -43,10 +43,10 @@
       src: ~/project/artifact.tar.gz
       dest: ~/backend/artifact.tar.gz
 
-# - name: "constuct env file"
-#   become: true
-#   shell: |
-#       cp ~/backend/development.env ~/backend/.env
+- name: "constuct env file"
+  become: true
+  shell: |
+      cp ~/backend/development.env ~/backend/.env
 
 - name: "start web server"
   become: true
@@ -58,10 +58,3 @@
 
 
 
-
-
-
-
-
-
-#############""""
