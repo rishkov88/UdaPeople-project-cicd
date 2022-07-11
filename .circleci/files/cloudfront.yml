@@ -20,9 +20,9 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !Sub "${WorkflowID}.s3.amazonaws.com"
+          - DomainName: !Sub "${WorkflowID}.s3-website-us-east-1.amazonaws.com"
             Id: webpage
-            S3OriginConfig:
+            S3OriginConfig: 
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
         Enabled: True
         DefaultRootObject: index.html
